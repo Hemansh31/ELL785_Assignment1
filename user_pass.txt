@@ -1,0 +1,26 @@
+/* Authorization Firstname Lastname username password */
+Professor Severus Snape snape.head@slytherin lilyHurts
+Professor Albus Dumbledore albus.headmaster@hogwarts grindelwaldBetrayed
+Professor Minerva McGonagall minerva.head@gryffindor catwoman
+Professor Alastor Moody moody@auror eyePatch
+Professor Pomona Sprout sprout@herbology mandrakeCry
+Student Harry Potter potter@gryffindor dieVoldemort
+Student Ronald Weasly ron@gryffindor alwaysHungry
+Student Fred Weasly fred@gryffindor twinGeorge
+Student George Weasly george@gryffindor twinFred
+Student Ginny Weasly ginny@gryffindor potterFan
+Student Hermoine Granger granger@gryffindor knowItAll
+Student Luna Lovegood luna@ravenclaw quibbler
+Student Neville Longbottom neville@gryffindor wickedBoom
+Student Draco Malfoy draco@slytherin iamscared
+Student Colin Creevy colin@gryffindor pfcHogwarts
+Student Dennis Creevy dennis@gryffindor phoenix
+Student Padma Patil padma@ravenclaw twinParvati
+Student Parvati Patil parvati@gryffindor twinPadma
+Student Cho Chang chang@ravenclaw loveConfuses
+Student Dean Thomas thomas@gryffindor ginnyHurts
+Student Seamus Finnigan seamus@gryffindor stupidSeamus
+Student Pansy Parkinson pansy@slytherin malfoyFan
+Student Susan Bones bones@hufflepuff skeleton
+Student Oliver Wood wood@gryffindor woodbury
+Student Cedric Diggory cedric@hufflepuff choBrokeUp
