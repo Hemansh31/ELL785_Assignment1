@@ -1,6 +1,8 @@
 # ELL785_Assignment1
-To compile
+**To compile :
+
 gcc -o filename code.c
 
-To run
+**To run :
+
 ./filename
