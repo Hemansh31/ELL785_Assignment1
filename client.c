@@ -4,8 +4,8 @@
 /* Input Buffer Size */
 #define MAX 1024
 /* Color Codes */
-#define CYAN    "\x1b[36m"
-#define RESET   "\x1b[0m"
+// #define CYAN    "\x1b[36m"
+// #define RESET   "\x1b[0m"
 /* Heading Banner to be displayed at the start of the Program */
 void showBanner(){
     printf("\n");
@@ -82,7 +82,7 @@ int main(){
     /* Initial Display */    
     showBanner();
     showMenu();
-    printf(CYAN SALUTATION RESET);
+    printf(SALUTATION);
 
     /* State variable denotes whether client is student or instructor ( if logged in yet )  or  if the Program has Just begun */
     /* The commands available to execute depend on the state of the Program */
@@ -120,7 +120,7 @@ int main(){
                 }
                 printf("\n");
             }           
-            printf(CYAN SALUTATION RESET);
+            printf(SALUTATION);
         }
     }
     return 0;
