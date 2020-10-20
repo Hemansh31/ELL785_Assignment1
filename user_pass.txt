@@ -1,9 +1,5 @@
 /* Authorization Firstname Lastname username password */
-Professor Severus Snape snape.head@slytherin lilyHurts
-Professor Albus Dumbledore albus.headmaster@hogwarts grindelwaldBetrayed
-Professor Minerva McGonagall minerva.head@gryffindor catwoman
-Professor Alastor Moody moody@auror eyePatch
-Professor Pomona Sprout sprout@herbology mandrakeCry
+Professor Albus Dumbledore instructor grindelwaldBetrayed
 Student Harry Potter potter@gryffindor dieVoldemort
 Student Ronald Weasly ron@gryffindor alwaysHungry
 Student Fred Weasly fred@gryffindor twinGeorge

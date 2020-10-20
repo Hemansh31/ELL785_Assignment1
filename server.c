@@ -1,5 +1,10 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<netinet/in.h>
+#include <string.h>
+#include <unistd.h>
 #define MAX 1024
 #define len 256
 
@@ -193,16 +198,44 @@ void createAuthMemory(struct auth *login_db, int *login_db_size, struct student 
     fclose(user_pass);
 }
 
-int main(){
+int main(int total_Arguments, char *argument_Pointers[]){
+
+    int socket_fd, newSocket_fd, port_Number, client_Address_Length, length;
+    char socket_Buffer[MAX];
+    struct sockaddr_in server_Address, client_Address;
+    if(total_Arguments < 2){
+        fprintf(stderr, "ERROR: no port number provided\n");
+        return 0;
+    }
+    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(socket_fd < 0){
+        fprintf(stderr, "ERROR opening socket\n");
+        return 0;
+    }
+    printf("Socket successfully opened \n");
+
+    bzero((char *) &server_Address, sizeof(server_Address));
+    port_Number = atoi(argument_Pointers[1]);
+    server_Address.sin_family = AF_INET;
+    server_Address.sin_port = htons(port_Number);
+    server_Address.sin_addr.s_addr = INADDR_ANY;
+    if(bind(socket_fd, (struct sockaddr *) &server_Address, sizeof(server_Address)) < 0){
+        fprintf(stderr, "ERROR binding\n");
+        return 0;
+    }
+    printf("Socket binding successfull \n");
+
     struct student marks_db[MAX];
     int marks_db_size = 0;
     createMarksMemory(marks_db, &marks_db_size);
+    printf("Student marks added to Cache \n");
     // for(int i = 0; i < marks_db_size ; i++){
     //     printf("%s %s %d %d %d %d %d\n", marks_db[i].firstname, marks_db[i].lastname, marks_db[i].transfiguration, marks_db[i].dada, marks_db[i].potions, marks_db[i].herbology, marks_db[i].charms);
     // }
     struct auth login_db[MAX];
     int login_db_size = 0;
     createAuthMemory(login_db, &login_db_size, marks_db, marks_db_size);
+    printf("Authorization details added to cache \n");
     // for(int i = 0; i < login_db_size; i++){
     //     printf("%s %s ", login_db[i].username, login_db[i].password);
     //     if(!login_db[i].clearance){
@@ -210,5 +243,60 @@ int main(){
     //     }
     //     printf("\n");
     // }
+    if( listen(socket_fd, 4) < 0){
+        fprintf(stderr, "ERROR listening\n");
+        return 0;
+    }
+    printf("Listening on port %d \n", port_Number);
+    client_Address_Length = sizeof(client_Address);
+    for( ; ; ){
+        newSocket_fd = accept(socket_fd, (struct sockaddr *) &client_Address, &client_Address_Length);
+        if(newSocket_fd < 0){
+            fprintf(stderr, "ERROR on accept\n");
+            return 0;
+        }
+        printf("%s\n", "Client Connected");
+        length = read(newSocket_fd, socket_Buffer, MAX);
+        printf("%s\n", socket_Buffer);
+        int found = -1;
+        int authenticated_User = -1;
+        for(int h = 0;h < login_db_size;h++){
+            if(compare_Strings(socket_Buffer, login_db[h].username) == 1){
+                found = h;
+                break;
+            }
+        }
+        if(found != -1){
+            length = write(newSocket_fd, "1", 2);
+            if(length < 0){printf("%s\n", "ERROR in Writing"); }
+            length = read(newSocket_fd, socket_Buffer, MAX);
+            printf("%s\n", socket_Buffer);
+            if(length < 0){printf("%s\n", "ERROR in Reading"); }
+            if(compare_Strings(socket_Buffer, login_db[found].password) == 1){
+                length = write(newSocket_fd, "1", 2);
+                if(length < 0){printf("%s\n", "ERROR in Writing"); }
+                printf("%s\n", "User Authenticated");
+                authenticated_User = found;
+
+                for( ; ; ){
+                    length = read(newSocket_fd, socket_Buffer, MAX);
+                    printf("%s\n", socket_Buffer);
+                    if(length < 0){printf("%s\n", "ERROR in Reading"); }
+                }
+                
+            }
+            else{
+                length = write(newSocket_fd, "0", 2);
+                if(length < 0){printf("%s\n", "ERROR in Writing"); }
+            }
+        }
+        else{
+            length = write(newSocket_fd, "0", 2);
+            if(length < 0){printf("%s\n", "ERROR in Writing"); }
+        }
+        close(newSocket_fd);
+        printf("%s\n", "Client Disconnected");
+    }    
+    close(socket_fd);
     return 0;
 }

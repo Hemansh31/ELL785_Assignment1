@@ -1,8 +1,16 @@
 #include<stdio.h>
+#include<stdlib.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<netinet/in.h>
+#include <string.h>
+#include <unistd.h>
+#include <netdb.h> 
 /* Prefix to every Output */
 #define SALUTATION "commandLine :$-> "
 /* Input Buffer Size */
 #define MAX 1024
+#define len 256
 /* Color Codes */
 // #define CYAN    "\x1b[36m"
 // #define RESET   "\x1b[0m"
@@ -19,7 +27,7 @@ void showBanner(){
 /* Menu Display when Program is in State 0 */
 void showMenu(){
     printf("\n");
-    printf("---To connect to the Database Server, type: connect [host name]----\n");
+    printf("---To connect to the Database Server, type: connect [host name] [port number]----\n");
     printf("\n");
     printf("-----------------To exit the Program, type: exit-------------------\n");
     printf("\n");
@@ -50,25 +58,35 @@ void clearBuffer(){
         c = getchar();
     }
 }
+
+/* returns length of string from character array by counting untill null character \0 */
+int getStringLength(char *str){
+    int length = 0;
+    while(str[length] != '\0' && length < MAX){
+        length++;
+    }
+    return length;
+}
+
 /* Check Validity of entered command and Return valid command codes */
-int check_Command_Validity(int program_State, int curr_Buffer_Size, char input_Buffer[]){
+int check_Command_Validity(int program_State, int curr_Buffer_Size, char *command_Buffer){
     if(program_State == 0){
-        if((curr_Buffer_Size < 4) || ((curr_Buffer_Size > 4) && (curr_Buffer_Size <= 8))){
+        if((curr_Buffer_Size != 4) && (curr_Buffer_Size != 7)){
             return -1;
         }
         else if(curr_Buffer_Size == 4){
             char exit[] = {"exit"};
             for(int h = 0; h < curr_Buffer_Size; h++){
-                if(input_Buffer[h] != exit[h]){
+                if(command_Buffer[h] != exit[h]){
                     return -1;
                 }
             }
             return 1;
         }
         else{
-            char connect[] = {"connect "};
+            char connect[] = {"connect"};
             for(int h = 0; h < 8; h++){
-                if(input_Buffer[h] != connect[h]){
+                if(command_Buffer[h] != connect[h]){
                     return -1;
                 }
             }
@@ -88,40 +106,115 @@ int main(){
     /* The commands available to execute depend on the state of the Program */
     int program_State = 0; // intial state
     char char_Input;
-    char input_Buffer[MAX] = {'\0'}; // Buffer Array
+    char command_Buffer[MAX] = {'\0'}; // Buffer Array
     int curr_Buffer_Size = 0; // Stores size of entered command string
+    int socket_fd, port_Number, length;
+    struct sockaddr_in server_Address;
+    struct hostent *server;
+    char socket_Buffer[MAX];
 
-    while(char_Input = getchar()){
-        curr_Buffer_Size = 0;
-        if(program_State == 0){            
-            while(char_Input != '\n'){
-                if(curr_Buffer_Size >= MAX){
-                    printf("Buffer Limit Exceeded");
+    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(socket_fd < 0){
+        fprintf(stderr, "ERROR opening socket\n");
+        return 0;
+    }   
+    while(scanf("%s", command_Buffer)){
+      if(program_State == 0){
+          close(socket_fd);
+          socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+          if(socket_fd < 0){
+              fprintf(stderr, "ERROR opening socket\n");
+              return 0;
+          }
+          int check = check_Command_Validity(program_State, getStringLength(command_Buffer), command_Buffer);
+          if(check == -1){
+              printf("Invalid Command\n");
+              clearBuffer();
+          }
+          else if(check == 1){
+              break;
+          }
+          else{
+              char_Input = getchar();
+              char hostname[MAX] = {'\0'};
+              char port[MAX] = {'\0'};
+              int space = -1;
+              while(char_Input != '\n'){
+                  if(char_Input != ' ' && space <= 0){
+                      space = 0;
+                      hostname[curr_Buffer_Size] = char_Input;
+                      char_Input = getchar();
+                      curr_Buffer_Size++;
+                  }
+                  else if(char_Input != ' ' && space == 1){
+                      port[curr_Buffer_Size] = char_Input;
+                      char_Input = getchar();
+                      curr_Buffer_Size++;
+                  }
+                  else if(char_Input == ' ' && space == 0){
+                      space = 1;
+                      char_Input = getchar();
+                      curr_Buffer_Size = 0;
+                  }
+                  else{
+                      char_Input = getchar();
+                  }
+              }
+              curr_Buffer_Size = 0;
+              if(getStringLength(hostname) == 0 || getStringLength(port) == 0){
+                  printf("Syntax Error\n");
+              }
+              else{
+                    port_Number = atoi(port);
+                    server = gethostbyname(hostname);
+                    if (server == NULL) {
+                        printf("ERROR, no such host\n");
+                        printf(SALUTATION); 
+                        continue;
+                    }
+                    bzero((char *) &server_Address, sizeof(server_Address));
+                    server_Address.sin_family = AF_INET;
+                    bcopy((char *) server->h_addr, (char *) &server_Address.sin_addr.s_addr, server->h_length);
+                    server_Address.sin_port = htons(port_Number);
+                    if(connect(socket_fd, (struct sockaddr *) &server_Address, sizeof(server_Address)) < 0){
+                        printf("ERROR connecting to host\n");
+                        printf(SALUTATION); 
+                        continue;
+                    }
+                    printf("[username] : ");
+                    scanf("%s", socket_Buffer);
                     clearBuffer();
-                    curr_Buffer_Size = 0;
-                    break;
+                    length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                    if(length < 0){printf("%s\n%s", "ERROR in Writing", SALUTATION); continue;}
+                    length = read(socket_fd, socket_Buffer, MAX);
+                    if(length < 0){printf("%s\n%s", "ERROR in Reading", SALUTATION); continue;}
+                    if(socket_Buffer[0] == '0'){
+                        printf("ERROR Invalid Username\n");
+                        printf(SALUTATION);
+                        continue;
+                    }
+                    else{
+                        printf("[password] : ");
+                        scanf("%s", socket_Buffer);
+                        clearBuffer();
+                        length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                        if(length < 0){printf("%s\n%s", "ERROR in Writing", SALUTATION); continue;}
+                        length = read(socket_fd, socket_Buffer, MAX);
+                        if(length < 0){printf("%s\n%s", "ERROR in Reading", SALUTATION); continue;}
+                        if(socket_Buffer[0] == '0'){
+                            printf("ERROR Invalid Password\n");
+                            printf(SALUTATION);
+                            continue;
+                        }
+                        else{
+                            program_State = 1;
+                        }
+                    }
                 }
-                else{
-                    input_Buffer[curr_Buffer_Size] = (char)char_Input;
-                    curr_Buffer_Size++;
-                    char_Input = getchar();
-                }
-            }
-            if(curr_Buffer_Size > 0){
-                int validity = check_Command_Validity(program_State, curr_Buffer_Size, input_Buffer);
-                if(validity == 1){
-                    break;
-                }
-                else if(validity == -1){
-                    printf("Invalid Command");
-                }
-                else{
-                    printf("%.*s",curr_Buffer_Size, input_Buffer);
-                }
-                printf("\n");
-            }           
-            printf(SALUTATION);
-        }
+          }
+      }
+       printf(SALUTATION);  
     }
+    close(socket_fd);
     return 0;
 }
