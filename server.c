@@ -256,46 +256,87 @@ int main(int total_Arguments, char *argument_Pointers[]){
             return 0;
         }
         printf("%s\n", "Client Connected");
-        length = read(newSocket_fd, socket_Buffer, MAX);
-        printf("%s\n", socket_Buffer);
+        int client_State = 0; // initial State;
+        int clearance = 0;
         int found = -1;
-        int authenticated_User = -1;
-        for(int h = 0;h < login_db_size;h++){
-            if(compare_Strings(socket_Buffer, login_db[h].username) == 1){
-                found = h;
-                break;
-            }
-        }
-        if(found != -1){
-            length = write(newSocket_fd, "1", 2);
-            if(length < 0){printf("%s\n", "ERROR in Writing"); }
-            length = read(newSocket_fd, socket_Buffer, MAX);
-            printf("%s\n", socket_Buffer);
-            if(length < 0){printf("%s\n", "ERROR in Reading"); }
-            if(compare_Strings(socket_Buffer, login_db[found].password) == 1){
-                length = write(newSocket_fd, "1", 2);
-                if(length < 0){printf("%s\n", "ERROR in Writing"); }
-                printf("%s\n", "User Authenticated");
-                authenticated_User = found;
 
-                for( ; ; ){
-                    length = read(newSocket_fd, socket_Buffer, MAX);
-                    printf("%s\n", socket_Buffer);
-                    if(length < 0){printf("%s\n", "ERROR in Reading"); }
+        for( ; ; ){
+            if(client_State == 0){
+
+                length = read(newSocket_fd, socket_Buffer, MAX); // reads username
+                printf("%s\n", socket_Buffer); // prints username
+                /* Searches entered username in the cache */
+                for(int h = 0;h < login_db_size;h++){
+                    if(compare_Strings(socket_Buffer, login_db[h].username) == 1){
+                        found = h;
+                        break;
+                    }
                 }
-                
+
+                if(found != -1){
+                    /* Checks is user is instructor */
+                    if(compare_Strings("instructor", socket_Buffer) == 1){
+                        clearance = 1;
+                    }
+                    length = write(newSocket_fd, "1", 2); // validates username
+
+                    length = read(newSocket_fd, socket_Buffer, MAX); // reads password
+                    printf("%s\n", socket_Buffer); // prints password
+
+                    if(compare_Strings(socket_Buffer, login_db[found].password) == 1){
+
+                        length = write(newSocket_fd, "1", 2); // validates password
+                        
+                        printf("%s\n", "User Authenticated");
+                        
+                        if(clearance == 1){
+                            client_State = 2;
+                        }
+                        else{
+                            client_State = 1;
+                        }                      
+                        
+                    }
+                    else{
+                        length = write(newSocket_fd, "0", 2);
+                        printf("%s\n", "Invalid Password");                        
+                        break;
+                    }
+                }
+                else{
+                    length = write(newSocket_fd, "0", 2);
+                    printf("%s\n", "Invalid Username"); 
+                    break;
+                }
+
             }
-            else{
-                length = write(newSocket_fd, "0", 2);
-                if(length < 0){printf("%s\n", "ERROR in Writing"); }
+            else if(client_State == 1){
+
+                printf("Student connected \n");
+                length = read(newSocket_fd, socket_Buffer, MAX);
+                printf("%s\n", socket_Buffer);
+                if(compare_Strings(socket_Buffer,"exit") == 1){
+                    break;
+                }
             }
+
+            else if(client_State == 2){
+
+                printf("Instructor connected \n");
+                length = read(newSocket_fd, socket_Buffer, MAX);
+                printf("%s\n", socket_Buffer);
+                if(compare_Strings(socket_Buffer,"exit") == 1){
+                    break;
+                }
+
+            }
+
         }
-        else{
-            length = write(newSocket_fd, "0", 2);
-            if(length < 0){printf("%s\n", "ERROR in Writing"); }
-        }
+
         close(newSocket_fd);
         printf("%s\n", "Client Disconnected");
+
+        
     }    
     close(socket_fd);
     return 0;

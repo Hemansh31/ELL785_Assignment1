@@ -93,6 +93,28 @@ int check_Command_Validity(int program_State, int curr_Buffer_Size, char *comman
             return 2;
         }
     }
+    else if(program_State == 1){
+        if(curr_Buffer_Size == 4){
+            char exit[] = {"exit"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != exit[h]){
+                    return -1;
+                }
+            }
+            return 1;
+        }
+    }
+    else if(program_State == 2){
+        if(curr_Buffer_Size == 4){
+            char exit[] = {"exit"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != exit[h]){
+                    return -1;
+                }
+            }
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -212,6 +234,39 @@ int main(){
                     }
                 }
           }
+      }
+      else if(program_State == 1){
+
+          int check = check_Command_Validity(program_State, getStringLength(command_Buffer), command_Buffer);
+          if(check == -1){
+              printf("Invalid Command\n");
+              clearBuffer();
+          }
+          else if(check == 1){
+              length = write(socket_fd, "exit", getStringLength("exit") + 1);
+              break;
+          }
+          else{
+
+          }
+
+      }
+
+      else if(program_State == 2){
+
+          int check = check_Command_Validity(program_State, getStringLength(command_Buffer), command_Buffer);
+          if(check == -1){
+              printf("Invalid Command\n");
+              clearBuffer();
+          }
+          else if(check == 1){
+              length = write(socket_fd, "exit", getStringLength("exit") + 1);
+              break;
+          }
+          else{
+
+          }
+
       }
        printf(SALUTATION);  
     }
