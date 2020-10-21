@@ -35,10 +35,20 @@ void showMenu(){
 /* Menu Display when Client is an authenticated Student */
 void showStudentMenu(){
     printf("\n");
-    printf("-------------------------COMMANDS AVAILABLE-----------------------\n");
-    printf("------To know more about a command type : help [command name]-----\n");
-    char *commandList = {
-        "connect"
+    printf("*******************************************************************\n");
+    printf("*                                                                 *\n");
+    printf("*                      COMMANDS AVAILABLE                         *\n");
+    printf("*  ______________________    ___________    ________    ________  *\n");
+    printf("* |                      |  |           |  |        |  |        | *\n");
+    printf("* | marks [subject name] |--| aggregate |--| minSub |--| maxSub | *\n");
+    printf("* |______________________|  |___________|  |________|  |________| *\n");
+    printf("*                                                                 *\n");
+    printf("*******************************************************************\n");
+    printf("\n");
+    printf("------To know more about a command, type : help [command name]-----\n");
+    printf("\n");
+    char *commandList[] = {
+        "marks [subject name]", "aggregate", "minSubject", "maxSubject"
     };
 }
 /* Menu Display when Client is an authenticated Instructor */
@@ -230,6 +240,7 @@ int main(){
                         }
                         else if(socket_Buffer[0] == '1'){
                             program_State = 1;
+                            showStudentMenu();
                         }
                         else{
                             program_State = 2;
