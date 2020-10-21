@@ -285,14 +285,16 @@ int main(int total_Arguments, char *argument_Pointers[]){
 
                     if(compare_Strings(socket_Buffer, login_db[found].password) == 1){
 
-                        length = write(newSocket_fd, "1", 2); // validates password
+                        
                         
                         printf("%s\n", "User Authenticated");
                         
                         if(clearance == 1){
+                            length = write(newSocket_fd, "2", 2); // validates password
                             client_State = 2;
                         }
                         else{
+                            length = write(newSocket_fd, "1", 2); // validates password
                             client_State = 1;
                         }                      
                         
@@ -312,7 +314,7 @@ int main(int total_Arguments, char *argument_Pointers[]){
             }
             else if(client_State == 1){
 
-                printf("Student connected \n");
+                printf("%s %s",(*login_db[found].link).firstname," connected \n");
                 length = read(newSocket_fd, socket_Buffer, MAX);
                 printf("%s\n", socket_Buffer);
                 if(compare_Strings(socket_Buffer,"exit") == 1){
@@ -322,7 +324,7 @@ int main(int total_Arguments, char *argument_Pointers[]){
 
             else if(client_State == 2){
 
-                printf("Instructor connected \n");
+                printf("%s %s",login_db[found].firstname," connected \n");
                 length = read(newSocket_fd, socket_Buffer, MAX);
                 printf("%s\n", socket_Buffer);
                 if(compare_Strings(socket_Buffer,"exit") == 1){

@@ -228,15 +228,17 @@ int main(){
                             printf(SALUTATION);
                             continue;
                         }
-                        else{
+                        else if(socket_Buffer[0] == '1'){
                             program_State = 1;
+                        }
+                        else{
+                            program_State = 2;
                         }
                     }
                 }
           }
       }
       else if(program_State == 1){
-
           int check = check_Command_Validity(program_State, getStringLength(command_Buffer), command_Buffer);
           if(check == -1){
               printf("Invalid Command\n");
@@ -253,7 +255,6 @@ int main(){
       }
 
       else if(program_State == 2){
-
           int check = check_Command_Validity(program_State, getStringLength(command_Buffer), command_Buffer);
           if(check == -1){
               printf("Invalid Command\n");
