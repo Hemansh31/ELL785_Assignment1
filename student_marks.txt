@@ -1,4 +1,4 @@
-/* Firstname   Lastname   Transfiguration   (Defence Against Dark Arts)   Potions   Herbology   Charms*/ /* Max Marks : 100 */
+/* Firstname   Lastname   (Transfiguration)   (Defence Against Dark Arts)   (Potions)   (Herbology)   (Charms) */ /* Max Marks : 100 */
 Harry Potter 74 99 100 34 76
 Ronald Weasly 52 75 85 15 84
 Hermoine Granger 99 97 94 99 99

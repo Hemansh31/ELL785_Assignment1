@@ -113,6 +113,42 @@ int check_Command_Validity(int program_State, int curr_Buffer_Size, char *comman
             }
             return 1;
         }
+        else if(curr_Buffer_Size == 5){
+            char marks[] = {"marks"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != marks[h]){
+                    return -1;
+                }
+            }
+            return 2;
+        }
+        else if(curr_Buffer_Size == 9){
+            char aggregate[] = {"aggregate"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != aggregate[h]){
+                    return -1;
+                }
+            }
+            return 3;
+        }
+        else if(curr_Buffer_Size == 6){
+            char minSub[] = {"minSub"};
+            char maxSub[] = {"maxSub"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != minSub[h]){
+                    for(int g = 0; g < curr_Buffer_Size; g++){
+                        if(command_Buffer[g] != maxSub[g]){
+                            return -1;
+                        }
+                    }
+                    return 5;
+                }
+            }
+            return 4;
+        }
+        else{
+            return -1;
+        }
     }
     else if(program_State == 2){
         if(curr_Buffer_Size == 4){
@@ -249,6 +285,7 @@ int main(){
                 }
           }
       }
+    
       else if(program_State == 1){
           int check = check_Command_Validity(program_State, getStringLength(command_Buffer), command_Buffer);
           if(check == -1){
@@ -259,13 +296,76 @@ int main(){
               length = write(socket_fd, "exit", getStringLength("exit") + 1);
               break;
           }
-          else{
+          else if(check == 2){
 
+          }
+          else if(check == 3){
+              char c = getchar();
+              int valid = 1;
+              while(c != '\n'){
+                  if(c != ' '){
+                      valid = 0;
+                  }
+                  c = getchar();
+              }
+              if(valid != 1){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n  ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else if(check == 4){
+              char c = getchar();
+              int valid = 1;
+              while(c != '\n'){
+                  if(c != ' '){
+                      valid = 0;
+                  }
+                  c = getchar();
+              }
+              if(valid != 1){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else if(check == 5){
+              char c = getchar();
+              int valid = 1;
+              while(c != '\n'){
+                  if(c != ' '){
+                      valid = 0;
+                  }
+                  c = getchar();
+              }
+              if(valid != 1){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else{
+              ;
           }
 
       }
 
-      else if(program_State == 2){
+     else if(program_State == 2){
           int check = check_Command_Validity(program_State, getStringLength(command_Buffer), command_Buffer);
           if(check == -1){
               printf("Invalid Command\n");
@@ -280,6 +380,7 @@ int main(){
           }
 
       }
+
        printf(SALUTATION);  
     }
     close(socket_fd);

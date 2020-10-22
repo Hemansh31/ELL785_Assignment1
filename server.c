@@ -7,16 +7,19 @@
 #include <unistd.h>
 #define MAX 1024
 #define len 256
+#define slen 8
+
+struct subject{
+    char *subjectName;
+    int marks;
+};
+
 
 /* struct definition for holding student marks */
 struct student{
     char firstname[len];
     char lastname[len];
-    int transfiguration;
-    int charms;
-    int potions;
-    int dada;
-    int herbology;
+    struct subject listOfSubjects[slen];
 };
 
 /* struct definition for holding user pass data */
@@ -58,11 +61,33 @@ int compare_Strings(char *str1, char *str2){
 /* Parses the student marks text file and stores the data in an array of struct student. 
 Caution: The following function assumes that the data in the given file occurs in a predefined order */
 /* The following code currently assumes that the files opened exist and the data in the them is arranged in a particular order and there are no duplicate entries in the file */
-void createMarksMemory(struct student *marks_db, int *marks_db_size){
+void createMarksMemory(struct student *marks_db, int *marks_db_size, char *file_descriptor, char subjectNames[slen][len], int *num_Sub){
     FILE *student_marks;
     char file_buffer[MAX];
     student_marks = fopen("student_marks.txt", "r");
-    fgets(file_buffer, MAX, (FILE*)student_marks);
+    fgets(file_descriptor, MAX, (FILE*)student_marks);
+    int open = -1;
+    int curr_len = 0;
+    for(int d = 0; d < getStringLength(file_descriptor); d++){
+        if(open == -1){
+            if(file_descriptor[d] == '('){
+                open = 0;
+                curr_len = 0;
+            }
+        }
+        else{
+            if(file_descriptor[d] != ')'){
+                subjectNames[*num_Sub][curr_len] = file_descriptor[d];
+                curr_len++;
+            }
+            else{
+                subjectNames[*num_Sub][curr_len] = '\0';
+                (*num_Sub)++;
+                curr_len = 0;
+                open = -1;
+            }
+        }
+    }
     while(fgets(file_buffer, MAX, (FILE*)student_marks)){
        struct student temporary;
        int pointer = 0;
@@ -74,7 +99,9 @@ void createMarksMemory(struct student *marks_db, int *marks_db_size){
        }
        temporary.firstname[cnt] = '\0';
        cnt = 0;
-       pointer++;
+        while(file_buffer[pointer] == ' '){
+            pointer++;
+        }
        while(file_buffer[pointer] != ' '){
            temporary.lastname[cnt] = file_buffer[pointer];
            pointer++;
@@ -82,49 +109,36 @@ void createMarksMemory(struct student *marks_db, int *marks_db_size){
        }
        temporary.lastname[cnt] = '\0';
        cnt = 0;
-       pointer++;
-       char tempo[3] = {'\0'};
-       while(file_buffer[pointer] != ' '){
-           tempo[cnt] = file_buffer[pointer];
+         while(file_buffer[pointer] == ' '){
+            pointer++;
+        }
+       char tempo[4] = {'\0'};
+
+        int sub_count = 0;
+
+       while(file_buffer[pointer] != '\0'){
+           char number[4] = {'\0'};
+           cnt = 0;
+           
+           while(file_buffer[pointer] == ' '){
+               pointer++;
+           }
+           while(file_buffer[pointer] != ' ' && file_buffer[pointer] != '\n'){
+               number[cnt] = file_buffer[pointer];
+               pointer++;
+               cnt++;
+           }
            pointer++;
-           cnt++;
+           number[cnt] = '\0';
+           if(sub_count < (*num_Sub)){
+                ((temporary.listOfSubjects[sub_count])).subjectName = (subjectNames[sub_count]);      
+                ((temporary.listOfSubjects[sub_count])).marks = atoi(number);
+                sub_count++;
+           }           
        }
-        temporary.transfiguration = atoi(tempo);
-        cnt = 0;
-        pointer++;
-        while(file_buffer[pointer] != ' '){
-           tempo[cnt] = file_buffer[pointer];
-           pointer++;
-           cnt++;
-       }       
-       temporary.dada = atoi(tempo);
-       cnt = 0;
-       pointer++;
-       while(file_buffer[pointer] != ' '){
-           tempo[cnt] = file_buffer[pointer];
-           pointer++;
-           cnt++;
-       }
-       temporary.potions = atoi(tempo);
-       cnt = 0;
-       pointer++;
-        while(file_buffer[pointer] != ' '){
-           tempo[cnt] = file_buffer[pointer];
-           pointer++;
-           cnt++;
-       }
-       temporary.herbology = atoi(tempo);
-       cnt = 0;
-       pointer++;
-       while(file_buffer[pointer] != '\n' && file_buffer[pointer] != '\0'){
-           tempo[cnt] = file_buffer[pointer];
-           pointer++;
-           cnt++;
-       }
-       temporary.charms = atoi(tempo);
-       cnt = 0;
+
        marks_db[*marks_db_size] = temporary;
-       *marks_db_size = (*marks_db_size) + 1;
+       (*marks_db_size) = (*marks_db_size) + 1;
     }
     fclose(student_marks);
 }
@@ -198,6 +212,19 @@ void createAuthMemory(struct auth *login_db, int *login_db_size, struct student 
     fclose(user_pass);
 }
 
+void addStrings(int size, char *strings[], char *socketBuffer){
+    int total_String_size = 0;
+    for(int h = 0;h < size;h++){
+        int curr_String_size = 0;
+        while(strings[h][curr_String_size] != '\0'){
+            socketBuffer[total_String_size] = strings[h][curr_String_size];
+            curr_String_size++;
+            total_String_size++;
+        }
+    }
+    socketBuffer[total_String_size] = '\0';
+}
+
 int main(int total_Arguments, char *argument_Pointers[]){
 
     int socket_fd, newSocket_fd, port_Number, client_Address_Length, length;
@@ -227,10 +254,22 @@ int main(int total_Arguments, char *argument_Pointers[]){
 
     struct student marks_db[MAX];
     int marks_db_size = 0;
-    createMarksMemory(marks_db, &marks_db_size);
+    char file_descriptor[MAX];
+    char subjectNames[slen][len];
+    int num_Sub = 0;
+    createMarksMemory(marks_db, &marks_db_size, file_descriptor, subjectNames, &num_Sub);
     printf("Student marks added to Cache \n");
+    // for(int g = 0; g < num_Sub; g++){
+    //     printf("%s ", subjectNames[g]);
+    // }
+    // printf("\n");
     // for(int i = 0; i < marks_db_size ; i++){
-    //     printf("%s %s %d %d %d %d %d\n", marks_db[i].firstname, marks_db[i].lastname, marks_db[i].transfiguration, marks_db[i].dada, marks_db[i].potions, marks_db[i].herbology, marks_db[i].charms);
+    //     printf("%s %s %d %d %d %d %d\n", marks_db[i].firstname, marks_db[i].lastname, marks_db[i].listOfSubjects[0].marks, marks_db[i].listOfSubjects[1].marks, marks_db[i].listOfSubjects[2].marks, marks_db[i].listOfSubjects[3].marks, marks_db[i].listOfSubjects[4].marks);
+    // }
+    // for(int i = 0; i < 2;i++){
+    //     for(int h = 0; h < num_Sub;h++){
+    //         printf("%s - %d \n", ((marks_db[i].listOfSubjects[h])).subjectName, ((marks_db[i].listOfSubjects[h])).marks);
+    //     }
     // }
     struct auth login_db[MAX];
     int login_db_size = 0;
@@ -296,6 +335,7 @@ int main(int total_Arguments, char *argument_Pointers[]){
                         else{
                             length = write(newSocket_fd, "1", 2); // validates password
                             client_State = 1;
+                            printf("%s %s",(*login_db[found].link).firstname," connected \n");
                         }                      
                         
                     }
@@ -314,11 +354,50 @@ int main(int total_Arguments, char *argument_Pointers[]){
             }
             else if(client_State == 1){
 
-                printf("%s %s",(*login_db[found].link).firstname," connected \n");
+                
                 length = read(newSocket_fd, socket_Buffer, MAX);
                 printf("%s\n", socket_Buffer);
                 if(compare_Strings(socket_Buffer,"exit") == 1){
                     break;
+                }
+                else if(compare_Strings(socket_Buffer, "aggregate") == 1){
+                    //int totalMarks = (*login_db[found].link).charms + (*login_db[found].link).transfiguration + (*login_db[found].link).potions + (*login_db[found].link).herbology + (*login_db[found].link).dada;
+                    int totalMarks = 0;
+                    for(int x = 0; x < num_Sub; x++){
+                        totalMarks = totalMarks + ((*login_db[found].link).listOfSubjects[x].marks);
+                    }
+
+                    float percentage = (((float)totalMarks)/5);
+                    char cent[MAX];
+                    sprintf(cent, "%f", percentage);
+                    char *strings[] = {
+                        "Name : ",
+                        (*login_db[found].link).firstname,
+                        " ",
+                        (*login_db[found].link).lastname,
+                        "\n",
+                        "  Aggregate Percentage : ",
+                        cent,
+                        " %"
+                    };
+                    addStrings(8, strings, socket_Buffer);
+                    length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                }
+                else if(compare_Strings(socket_Buffer, "minSub") == 1){
+                    char *subjects[] = {
+                        "Transfiguration",
+                        "Charms",
+                        "Potions",
+                        "Herbology",
+                        "Defence against Dark Arts"
+                    };
+
+                }
+                else if(compare_Strings(socket_Buffer, "maxSub") == 1){
+                    
+                }
+                else{
+
                 }
             }
 
