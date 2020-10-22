@@ -164,6 +164,20 @@ int check_Command_Validity(int program_State, int curr_Buffer_Size, char *comman
     return 0;
 }
 
+
+void addStrings(int size, char *strings[], char *socketBuffer){
+    int total_String_size = 0;
+    for(int h = 0;h < size;h++){
+        int curr_String_size = 0;
+        while(strings[h][curr_String_size] != '\0'){
+            socketBuffer[total_String_size] = strings[h][curr_String_size];
+            curr_String_size++;
+            total_String_size++;
+        }
+    }
+    socketBuffer[total_String_size] = '\0';
+}
+
 int main(){
     /* Initial Display */    
     showBanner();
@@ -297,7 +311,31 @@ int main(){
               break;
           }
           else if(check == 2){
-
+              char argument[MAX] = {'\0'};
+              char c = getchar();
+              int curr_size = 0;
+              while(c != '\n'){
+                  argument[curr_size] = (char)c;
+                  curr_size++;
+                  c = getchar();
+              }
+              argument[curr_size] = '\0';
+              if(getStringLength(argument) == 0){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  char *strings[2] = {
+                      command_Buffer,
+                      argument
+                  };
+                  addStrings(2, strings, socket_Buffer);
+                  length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n   ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+              
           }
           else if(check == 3){
               char c = getchar();
@@ -314,7 +352,7 @@ int main(){
               else{
                   length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
                   length = read(socket_fd, socket_Buffer, MAX);
-                  printf("\n  ");
+                  printf("\n   ");
                   printf("%s\n",socket_Buffer);
                   printf("\n");
               }
@@ -334,7 +372,7 @@ int main(){
               else{
                   length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
                   length = read(socket_fd, socket_Buffer, MAX);
-                  printf("\n");
+                  printf("\n   ");
                   printf("%s\n",socket_Buffer);
                   printf("\n");
               }
@@ -354,7 +392,7 @@ int main(){
               else{
                   length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
                   length = read(socket_fd, socket_Buffer, MAX);
-                  printf("\n");
+                  printf("\n   ");
                   printf("%s\n",socket_Buffer);
                   printf("\n");
               }

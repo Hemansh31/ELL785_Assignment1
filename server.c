@@ -357,11 +357,11 @@ int main(int total_Arguments, char *argument_Pointers[]){
                 
                 length = read(newSocket_fd, socket_Buffer, MAX);
                 printf("%s\n", socket_Buffer);
+                
                 if(compare_Strings(socket_Buffer,"exit") == 1){
                     break;
                 }
                 else if(compare_Strings(socket_Buffer, "aggregate") == 1){
-                    //int totalMarks = (*login_db[found].link).charms + (*login_db[found].link).transfiguration + (*login_db[found].link).potions + (*login_db[found].link).herbology + (*login_db[found].link).dada;
                     int totalMarks = 0;
                     for(int x = 0; x < num_Sub; x++){
                         totalMarks = totalMarks + ((*login_db[found].link).listOfSubjects[x].marks);
@@ -376,7 +376,7 @@ int main(int total_Arguments, char *argument_Pointers[]){
                         " ",
                         (*login_db[found].link).lastname,
                         "\n",
-                        "  Aggregate Percentage : ",
+                        "   Aggregate Percentage : ",
                         cent,
                         " %"
                     };
@@ -384,20 +384,151 @@ int main(int total_Arguments, char *argument_Pointers[]){
                     length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
                 }
                 else if(compare_Strings(socket_Buffer, "minSub") == 1){
-                    char *subjects[] = {
-                        "Transfiguration",
-                        "Charms",
-                        "Potions",
-                        "Herbology",
-                        "Defence against Dark Arts"
+                    int minMarks = 100;
+                    for(int a = 0; a < num_Sub; a++){
+                        if((*login_db[found].link).listOfSubjects[a].marks < minMarks){
+                            minMarks = (*login_db[found].link).listOfSubjects[a].marks;
+                        }
+                    }
+                    //printf("%d\n", minMarks);
+                    char *tstrings[] = {
+                        "Name : ",
+                        (*login_db[found].link).firstname,
+                        " ",
+                        (*login_db[found].link).lastname,
+                        "\n",
+                        "   Subjects with Minimum Marks : ",
                     };
+                    char strs[MAX];
+                    addStrings(6, tstrings, strs);
+                    char *strings[64];
+                    strings[0] = strs;
+                    int curr_size = 1;
+                    int withMin = 0;
+                    for(int a = 0; a < num_Sub; a++){
+                        if((*login_db[found].link).listOfSubjects[a].marks == minMarks){
+                            if(withMin > 0){
+                                strings[curr_size] = " , ";
+                                curr_size++;
+                            }
+                            strings[curr_size] = (*login_db[found].link).listOfSubjects[a].subjectName;
+                            curr_size++;
+                            withMin++;
+                        }
+                    }
+                    strings[curr_size] = "\n   Minimum Marks : ";
+                    char num[len];
+                    sprintf(num, "%d", minMarks);
+                    curr_size++;
+                    strings[curr_size] = num;
+                    curr_size++;
+                    //printf("%s\n", num);
+                    addStrings(curr_size, strings, socket_Buffer);
+                    //printf("%s\n", socket_Buffer);
+                    length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
 
                 }
                 else if(compare_Strings(socket_Buffer, "maxSub") == 1){
-                    
+                    int maxMarks = 0;
+                    for(int a = 0; a < num_Sub; a++){
+                        if((*login_db[found].link).listOfSubjects[a].marks > maxMarks){
+                            maxMarks = (*login_db[found].link).listOfSubjects[a].marks;
+                        }
+                    }
+                    //printf("%d\n", maxMarks);
+                    char *tstrings[] = {
+                        "Name : ",
+                        (*login_db[found].link).firstname,
+                        " ",
+                        (*login_db[found].link).lastname,
+                        "\n",
+                        "   Subjects with Maximum Marks : ",
+                    };
+                    char strs[MAX];
+                    addStrings(6, tstrings, strs);
+                    char *strings[64];
+                    strings[0] = strs;
+                    int curr_size = 1;
+                    int withMin = 0;
+                    for(int a = 0; a < num_Sub; a++){
+                        if((*login_db[found].link).listOfSubjects[a].marks == maxMarks){
+                            if(withMin > 0){
+                                strings[curr_size] = " , ";
+                                curr_size++;
+                            }
+                            strings[curr_size] = (*login_db[found].link).listOfSubjects[a].subjectName;
+                            curr_size++;
+                            withMin++;
+                        }
+                    }
+                    strings[curr_size] = "\n   Maximum Marks : ";
+                    char num[len];
+                    sprintf(num, "%d", maxMarks);
+                    curr_size++;
+                    strings[curr_size] = num;
+                    curr_size++;
+                    //printf("%s\n", num);
+                    addStrings(curr_size, strings, socket_Buffer);
+                    //printf("%s\n", socket_Buffer);
+                    length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
                 }
                 else{
-
+                    char command[len];
+                    char arguement[len];
+                    int space = 0;
+                    for(int i = 0; socket_Buffer[i] != '\0'; i++){
+                        if(space == 0){
+                            if(socket_Buffer[i] != ' '){
+                                command[i] = socket_Buffer[i];
+                            }
+                            else{
+                                command[i] = '\0';
+                                space = i+1;
+                            }
+                        }
+                        else{
+                            arguement[i-space] = socket_Buffer[i];
+                            arguement[i-space+1] = '\0';
+                        }
+                    }
+                    if(compare_Strings("marks", command) != 1){
+                        length = write(newSocket_fd, "Invalid Command", getStringLength("Invalid Command") + 1);
+                    }
+                    else{
+                        int subMatch = -1;
+                        char *matchedSubject;
+                        int mArks;
+                        for(int a = 0; a < num_Sub; a++){
+                            if(compare_Strings(arguement, ((*login_db[found].link).listOfSubjects[a].subjectName)) == 1){
+                                matchedSubject = ((*login_db[found].link).listOfSubjects[a].subjectName);
+                                subMatch = a;
+                                mArks = ((*login_db[found].link).listOfSubjects[a].marks);
+                                break;
+                            }
+                        }
+                        if(subMatch == -1){
+                            length = write(newSocket_fd, "No Such Subject", getStringLength("No Such Subject") + 1);
+                        }
+                        else{
+                            char cent[MAX];
+                            sprintf(cent, "%d", mArks);
+                            char *strings[] = {
+                                "Name : ",
+                                (*login_db[found].link).firstname,
+                                " ",
+                                (*login_db[found].link).lastname,
+                                "\n",
+                                "   Subject Name : ",
+                                matchedSubject,
+                                "\n",
+                                "   Marks Obtained : ",
+                                cent
+                            };
+                            addStrings(10, strings, socket_Buffer);
+                            length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                        }
+                    }
+                    
                 }
             }
 
