@@ -5,7 +5,7 @@ Student Ronald Weasly ron@gryffindor alwaysHungry
 Student Fred Weasly fred@gryffindor twinGeorge
 Student George Weasly george@gryffindor twinFred
 Student Ginny Weasly ginny@gryffindor potterFan
-Student Hermoine Granger granger@gryffindor knowItAll
+Student Hermione Granger granger@gryffindor knowItAll
 Student Luna Lovegood luna@ravenclaw quibbler
 Student Neville Longbottom neville@gryffindor wickedBoom
 Student Draco Malfoy draco@slytherin iamscared

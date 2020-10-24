@@ -1,7 +1,7 @@
 /* Firstname   Lastname   (Transfiguration)   (Defence Against Dark Arts)   (Potions)   (Herbology)   (Charms) */ /* Max Marks : 100 */
 Harry Potter 74 99 100 74 76
 Ronald Weasly 52 75 85 15 84
-Hermoine Granger 99 97 94 99 99
+Hermione Granger 99 97 94 99 99
 Neville Longbottom 65 43 14 96 87
 Draco Malfoy 85 90 75 8 15
 Luna Lovegood 78 75 81 82 79
@@ -17,5 +17,5 @@ Fred Weasly 75 80 86 12 45
 George Weasly 75 80 86 12 45
 Oliver Wood 78 87 98 81 88
 Parvati Patil 45 74 89 65 34
-Padmi Patil 45 74 89 65 34
+Padma Patil 45 74 89 65 34
 Dennis Creevy 84 45 89 65 37

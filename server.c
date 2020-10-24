@@ -540,7 +540,386 @@ int main(int total_Arguments, char *argument_Pointers[]){
                 if(compare_Strings(socket_Buffer,"exit") == 1){
                     break;
                 }
+                else if(compare_Strings(socket_Buffer, "BestStudent") == 1){
+                    
+                    int maxM = 0;
+                    int totals[login_db_size];
+                    for(int i=0; i<login_db_size; i++)
+                    {
+                      if((login_db[i].link) != NULL){
+                      int totalMarks=0;
+                      for(int x = 0; x < num_Sub; x++){
+                        totalMarks = totalMarks + ((*login_db[i].link).listOfSubjects[x].marks);
+                      }
+                      totals[i] = totalMarks;
+                      if(maxM < totalMarks)
+                        maxM = totalMarks;
+                      }
+                    }
+                    int indices[login_db_size] ;
+                    int counting=0;
+                    for(int i=0; i<login_db_size; i++)
+                    {
+                      if(maxM == totals[i])
+                      {
+                        indices[counting] = i;
+                        counting++;
+                      }
+                    }
+                    float percentage = (((float)maxM)/5);
+                    char cent[MAX];
+                    sprintf(cent, "%f", percentage);
+                    char *strings[64];
+                    strings[0] = "The student(s) with best aggregate score is(are) : ";
+                    int sizeNow = 1;
+                    for(int i=0; i<counting; i++)
+                    {
+                      if(i != counting-1){
+                        strings[sizeNow] = (*login_db[indices[i]].link).firstname;
+                        sizeNow++;
+                        strings[sizeNow] = " ";
+                        sizeNow++;
+                        strings[sizeNow] = (*login_db[indices[i]].link).lastname;
+                        sizeNow++;
+                        strings[sizeNow] = ", ";
+                        sizeNow++;
+                      }
+                      else
+                      {
+                        strings[sizeNow] = (*login_db[indices[i]].link).firstname;
+                        sizeNow++;
+                        strings[sizeNow] = " ";
+                        sizeNow++;
+                        strings[sizeNow] = (*login_db[indices[i]].link).lastname;
+                        sizeNow++;
+                      }
+                    }
+                    strings[sizeNow] = "\n   ";
+                    sizeNow++;
+                    strings[sizeNow] = "Best aggregate score is : ";
+                    sizeNow++;
+                    strings[sizeNow] = cent;
+                    sizeNow++;
+                    strings[sizeNow] = "%";
+                    sizeNow++;
+                    addStrings(sizeNow, strings, socket_Buffer);
+                    length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
 
+
+                }
+                else if(compare_Strings(socket_Buffer, "WorstStudent") == 1){
+                    
+                    int minM = MAX;
+                    int totals[login_db_size];
+                    for(int i=0; i<login_db_size; i++)
+                    {
+                      if((login_db[i].link) != NULL){
+                      int totalMarks=0;
+                      for(int x = 0; x < num_Sub; x++){
+                        totalMarks = totalMarks + ((*login_db[i].link).listOfSubjects[x].marks);
+                      }
+                      totals[i] = totalMarks;
+                      if(minM > totalMarks)
+                        minM = totalMarks;
+                      }
+                    }
+                    int indices[login_db_size] ;
+                    int counting=0;
+                    for(int i=0; i<login_db_size; i++)
+                    {
+                      if(minM == totals[i])
+                      {
+                        indices[counting] = i;
+                        counting++;
+                      }
+                    }
+                    float percentage = (((float)minM)/5);
+                    char cent[MAX];
+                    sprintf(cent, "%f", percentage);
+                    char *strings[64];
+                    strings[0] = "The student(s) with worst aggregate score is(are) : ";
+                    int sizeNow = 1;
+                    for(int i=0; i<counting; i++)
+                    {
+                      if(i != counting-1){
+                        strings[sizeNow] = (*login_db[indices[i]].link).firstname;
+                        sizeNow++;
+                        strings[sizeNow] = " ";
+                        sizeNow++;
+                        strings[sizeNow] = (*login_db[indices[i]].link).lastname;
+                        sizeNow++;
+                        strings[sizeNow] = ", ";
+                        sizeNow++;
+                      }
+                      else
+                      {
+                        strings[sizeNow] = (*login_db[indices[i]].link).firstname;
+                        sizeNow++;
+                        strings[sizeNow] = " ";
+                        sizeNow++;
+                        strings[sizeNow] = (*login_db[indices[i]].link).lastname;
+                        sizeNow++;
+                      }
+                    }
+                    strings[sizeNow] = "\n   ";
+                    sizeNow++;
+                    strings[sizeNow] = "Worst aggregate score is : ";
+                    sizeNow++;
+                    strings[sizeNow] = cent;
+                    sizeNow++;
+                    strings[sizeNow] = "%";
+                    sizeNow++;
+                    addStrings(sizeNow, strings, socket_Buffer);
+                    length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+
+
+              }
+              else
+              {
+                    char command[len];
+                    char argument[len];
+                    int space = 0;
+                    for(int i = 0; socket_Buffer[i] != '\0'; i++)
+                    {
+                        if(space == 0){
+                            if(socket_Buffer[i] != ' '){
+                                command[i] = socket_Buffer[i];
+                            }
+                            else{
+                                command[i] = '\0';
+                                space = i+1;
+                            }
+                        }
+                        else{
+                            argument[i-space] = socket_Buffer[i];
+                            argument[i-space+1] = '\0';
+                        }
+                    }
+
+                    if(compare_Strings("marks", command) == 1)
+                    {
+                      int subIndex = -1;
+                      int counting = 0;
+                      char *strings[MAX];
+                      int sizeNow = 0;
+                      int exists = 0;
+                      char mar[MAX];
+                      int pointer = 0;
+
+                      for(int i=0; i< login_db_size; i++)
+                      {
+                        if((login_db[i].link) != NULL)
+                        {
+                          counting++;
+                          if(counting == 1)
+                          {
+                            for(int j=0; j<num_Sub; j++)
+                            {
+                              if(compare_Strings(argument, ((*login_db[i].link).listOfSubjects[j].subjectName)) == 1)
+                              {
+                                exists = 1;
+                                subIndex = j;
+                                strings[sizeNow] = (*login_db[i].link).firstname;
+                                sizeNow++;
+                                // printf("%s\n", (*login_db[i].link).firstname);
+                                strings[sizeNow] = " ";
+                                sizeNow++;
+                                strings[sizeNow] = (*login_db[i].link).lastname;
+                                sizeNow++;
+                                strings[sizeNow] = " : ";
+                                sizeNow++;
+                              
+                                int maR = (*login_db[i].link).listOfSubjects[j].marks;
+                                // printf("%d", maR);
+                                sprintf(mar + pointer, "%d", maR);
+                                // pointer + = 4;
+                                // printf("%s\n", mar);
+                                strings[sizeNow] = mar + pointer;
+                                pointer = pointer + 4;
+                                sizeNow++;
+                                strings[sizeNow] = "\n   ";
+                                sizeNow++;
+                                
+                              }
+                            }
+                          }
+                          else
+                          {
+                                strings[sizeNow] = (*login_db[i].link).firstname;
+                                sizeNow++;
+                                strings[sizeNow] = " ";
+                                sizeNow++;
+                                strings[sizeNow] = (*login_db[i].link).lastname;
+                                sizeNow++;
+                                strings[sizeNow] = " : ";
+                                sizeNow++;
+                                
+                                int maR = (*login_db[i].link).listOfSubjects[subIndex].marks;
+                                sprintf(mar + pointer, "%d", maR);
+                                strings[sizeNow] = mar + pointer;
+                                pointer = pointer + 4;
+                                sizeNow++;
+                                strings[sizeNow] = "\n   ";
+                                sizeNow++; 
+                          }
+
+                        }
+                      }
+                      if(exists == 1){
+                      addStrings(sizeNow, strings, socket_Buffer);
+                      length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                      }
+                      else
+                      {
+                        length = write(newSocket_fd, "No Such Subject", getStringLength("No Such Subject") + 1);
+
+                      }
+                    }
+                    else if(compare_Strings("classAvg", command) == 1)
+                    {
+                      int subIndex = -1;
+                      int counting = 0;
+                      int exists = 0;
+                      int totalM = 0;
+
+                      for(int i=0; i< login_db_size; i++)
+                      {
+                        if((login_db[i].link) != NULL)
+                        {
+                          counting++;
+                          if(counting == 1)
+                          {
+                            for(int j=0; j<num_Sub; j++)
+                            {
+                              if(compare_Strings(argument, ((*login_db[i].link).listOfSubjects[j].subjectName)) == 1)
+                              {
+                                exists = 1;
+                                subIndex = j;
+                                totalM = totalM + (*login_db[i].link).listOfSubjects[j].marks;
+                                
+                              }
+                            }
+                          }
+                          else
+                          {
+                                totalM = totalM + (*login_db[i].link).listOfSubjects[subIndex].marks;
+                          }
+
+                        }
+                      }
+                      char finalper[MAX];
+                      float avg = (float)totalM/(login_db_size-1);
+                      sprintf(finalper, "%f", avg);
+                      char *strings[3] = {"The class average for this subject is : ", finalper, "\n"};
+
+                      if(exists == 1){
+                      addStrings(3, strings, socket_Buffer);
+                      length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                      }
+                      else
+                      {
+                        length = write(newSocket_fd, "No Such Subject", getStringLength("No Such Subject") + 1);
+
+                      }
+                    }
+                    else if(compare_Strings("numPassed", command) == 1)
+                    {
+                      int subIndex = -1;
+                      int counting = 0;
+                      int exists = 0;
+                      int passed = 0;
+
+                      for(int i=0; i< login_db_size; i++)
+                      {
+                        if((login_db[i].link) != NULL)
+                        {
+                          counting++;
+                          if(counting == 1)
+                          {
+                            for(int j=0; j<num_Sub; j++)
+                            {
+                              if(compare_Strings(argument, ((*login_db[i].link).listOfSubjects[j].subjectName)) == 1)
+                              {
+                                exists = 1;
+                                subIndex = j;
+                                if((*login_db[i].link).listOfSubjects[j].marks >= 33)
+                                  passed++;
+                                
+                              }
+                            }
+                          }
+                          else
+                          {
+                            if((*login_db[i].link).listOfSubjects[subIndex].marks >= 33)
+                                  passed++;
+                          }
+
+                        }
+                      }
+                      char finalpass[MAX];
+                      sprintf(finalpass, "%d", passed);
+                      char *strings[2] = {"The number of students who passed this subject is : ", finalpass};
+
+                      if(exists == 1){
+                      addStrings(2, strings, socket_Buffer);
+                      length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                      }
+                      else
+                      {
+                        length = write(newSocket_fd, "No Such Subject", getStringLength("No Such Subject") + 1);
+
+                      }
+                    }
+                    else if(compare_Strings("numFailed", command) == 1)
+                    {
+                      int subIndex = -1;
+                      int counting = 0;
+                      int exists = 0;
+                      int passed = 0;
+
+                      for(int i=0; i< login_db_size; i++)
+                      {
+                        if((login_db[i].link) != NULL)
+                        {
+                          counting++;
+                          if(counting == 1)
+                          {
+                            for(int j=0; j<num_Sub; j++)
+                            {
+                              if(compare_Strings(argument, ((*login_db[i].link).listOfSubjects[j].subjectName)) == 1)
+                              {
+                                exists = 1;
+                                subIndex = j;
+                                if((*login_db[i].link).listOfSubjects[j].marks < 33)
+                                  passed++;
+                                
+                              }
+                            }
+                          }
+                          else
+                          {
+                            if((*login_db[i].link).listOfSubjects[subIndex].marks < 33)
+                                  passed++;
+                          }
+
+                        }
+                      }
+                      char finalpass[MAX];
+                      sprintf(finalpass, "%d", passed);
+                      char *strings[2] = {"The number of students who failed this subject is : ", finalpass};
+
+                      if(exists == 1){
+                      addStrings(2, strings, socket_Buffer);
+                      length = write(newSocket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                      }
+                      else
+                      {
+                        length = write(newSocket_fd, "No Such Subject", getStringLength("No Such Subject") + 1);
+
+                      }
+                    }
+
+            }
             }
 
         }

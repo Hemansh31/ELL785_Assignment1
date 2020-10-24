@@ -54,7 +54,28 @@ void showStudentMenu(){
 /* Menu Display when Client is an authenticated Instructor */
 void showInstructorMenu(){
     printf("\n");
-    printf("-------------------------COMMANDS AVAILABLE-----------------------\n");
+    printf("*******************************************************************\n");
+    printf("*    WELCOME, ALBUS!!                                             *\n");
+    printf("*                                                                 *\n");
+    printf("*                      COMMANDS AVAILABLE                         *\n");
+    printf("*  ______________________             _________________________   *\n");
+    printf("* |                      |           |                         |  *\n");
+    printf("* | marks [subject name] |     --    | classAvg [subject name] |  *\n");
+    printf("* |______________________|           |_________________________|  *\n");
+    printf("*  ______________________             _________________________   *\n");
+    printf("* |                      |           |                         |  *\n");
+    printf("* | numPassed [subject]  |     --    |   numFailed [subject]   |  *\n");
+    printf("* |______________________|           |_________________________|  *\n");
+    printf("*  ______________________             _________________________   *\n");
+    printf("* |                      |           |                         |  *\n");
+    printf("* |      BestStudent     |     --    |       WorstStudent      |  *\n");
+    printf("* |______________________|           |_________________________|  *\n");
+    printf("*               _________________________________                 *\n");
+    printf("*              |                                 |                *\n");
+    printf("*           -- | updateMarks [student] [subject] | --             *\n");
+    printf("*              |_________________________________|                *\n");
+    printf("*                                                                 *\n");
+    printf("*******************************************************************\n");
     printf("------To know more about a command type : help [command name]-----\n");
     char *commandList = {
         "connect"
@@ -159,6 +180,72 @@ int check_Command_Validity(int program_State, int curr_Buffer_Size, char *comman
                 }
             }
             return 1;
+        }
+        else if(curr_Buffer_Size == 5){
+            char marks[] = {"marks"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != marks[h]){
+                    return -1;
+                }
+            }
+            return 2;
+        }
+        else if(curr_Buffer_Size == 8){
+            char classAvg[] = {"classAvg"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != classAvg[h]){
+                    return -1;
+                }
+            }
+            return 3;
+        }
+        else if(curr_Buffer_Size == 9){
+            char numP[] = {"numPassed"};
+            char numF[] = {"numFailed"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != numP[h]){
+                    for(int g = 0; g < curr_Buffer_Size; g++){
+                        if(command_Buffer[g] != numF[g]){
+                            return -1;
+                        }
+                    }
+                    return 5;
+                }
+            }
+            return 4;
+        }
+        else if(curr_Buffer_Size == 11){
+            char best[] = {"BestStudent"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != best[h]){
+                    return -1;
+                }
+            }
+            return 6;
+           
+        }
+        else if(curr_Buffer_Size == 12){
+            char worst[] = {"WorstStudent"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != worst[h]){
+                    return -1;
+                }
+            }
+            return 7;
+        }
+        else if(curr_Buffer_Size == 11){
+            char update[] = {"updateMarks"};
+            for(int h = 0; h < curr_Buffer_Size; h++){
+                if(command_Buffer[h] != update[h]){
+                    return -1;
+                }
+            }
+            return 8;
+            
+        }
+           
+        else{
+            return -1;
         }
     }
     return 0;
@@ -294,6 +381,7 @@ int main(){
                         }
                         else{
                             program_State = 2;
+                            showInstructorMenu();
                         }
                     }
                 }
@@ -412,6 +500,150 @@ int main(){
           else if(check == 1){
               length = write(socket_fd, "exit", getStringLength("exit") + 1);
               break;
+          }
+          else if(check == 2){
+              char argument[MAX] = {'\0'};
+              char c = getchar();
+              int curr_size = 0;
+              while(c != '\n'){
+                  argument[curr_size] = (char)c;
+                  curr_size++;
+                  c = getchar();
+              }
+              argument[curr_size] = '\0';
+              if(getStringLength(argument) == 0){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  char *strings[2] = {
+                      command_Buffer,
+                      argument
+                  };
+                  addStrings(2, strings, socket_Buffer);
+                  length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n   ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else if(check == 3){
+              char argument[MAX] = {'\0'};
+              char c = getchar();
+              int curr_size = 0;
+              while(c != '\n'){
+                  argument[curr_size] = (char)c;
+                  curr_size++;
+                  c = getchar();
+              }
+              argument[curr_size] = '\0';
+              if(getStringLength(argument) == 0){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  char *strings[2] = {
+                      command_Buffer,
+                      argument
+                  };
+                  addStrings(2, strings, socket_Buffer);
+                  length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n   ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else if(check == 4){
+              char argument[MAX] = {'\0'};
+              char c = getchar();
+              int curr_size = 0;
+              while(c != '\n'){
+                  argument[curr_size] = (char)c;
+                  curr_size++;
+                  c = getchar();
+              }
+              argument[curr_size] = '\0';
+              if(getStringLength(argument) == 0){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  char *strings[2] = {
+                      command_Buffer,
+                      argument
+                  };
+                  addStrings(2, strings, socket_Buffer);
+                  length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n   ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else if(check == 5){
+              char argument[MAX] = {'\0'};
+              char c = getchar();
+              int curr_size = 0;
+              while(c != '\n'){
+                  argument[curr_size] = (char)c;
+                  curr_size++;
+                  c = getchar();
+              }
+              argument[curr_size] = '\0';
+              if(getStringLength(argument) == 0){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  char *strings[2] = {
+                      command_Buffer,
+                      argument
+                  };
+                  addStrings(2, strings, socket_Buffer);
+                  length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n   ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else if(check == 6){
+              char c = getchar();
+              int valid = 1;
+              while(c != '\n'){
+                  if(c != ' '){
+                      valid = 0;
+                  }
+                  c = getchar();
+              }
+              if(valid != 1){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n   ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
+          }
+          else if(check == 7){
+              char c = getchar();
+              int valid = 1;
+              while(c != '\n'){
+                  if(c != ' '){
+                      valid = 0;
+                  }
+                  c = getchar();
+              }
+              if(valid != 1){
+                  printf("Syntax Error\n");
+              }
+              else{
+                  length = write(socket_fd, command_Buffer, getStringLength(command_Buffer) + 1);
+                  length = read(socket_fd, socket_Buffer, MAX);
+                  printf("\n   ");
+                  printf("%s\n",socket_Buffer);
+                  printf("\n");
+              }
           }
           else{
 
