@@ -45,8 +45,6 @@ void showStudentMenu(){
     printf("*                                                                 *\n");
     printf("*******************************************************************\n");
     printf("\n");
-    printf("------To know more about a command, type : help [command name]-----\n");
-    printf("\n");
     char *commandList[] = {
         "marks [subject name]", "aggregate", "minSubject", "maxSubject"
     };
@@ -76,10 +74,7 @@ void showInstructorMenu(){
     printf("*   |_________________________________________________________|   *\n");
     printf("*                                                                 *\n");
     printf("*******************************************************************\n");
-    printf("------To know more about a command type : help [command name]-----\n");
-    char *commandList = {
-        "connect"
-    };
+    printf("\n");
 }
 /* Clear Terminal Input Buffer */
 void clearBuffer(){
@@ -660,7 +655,9 @@ int main(){
           {
               char argument1[MAX] = {'\0'};
               char c = getchar();
-              c = getchar();
+              if(c != '\n'){
+                  c = getchar();
+              }              
               int curr_size1 = 0;
               while(c != ' ' && c != '\n'){
                   argument1[curr_size1] = (char)c;
@@ -670,7 +667,10 @@ int main(){
               argument1[curr_size1] = '\0';
               
               char argument2[MAX] = {'\0'};
-              c = getchar();
+              
+              if(c != '\n'){
+                  c = getchar();
+              }
               int curr_size2 = 0;
               while(c != ' ' && c != '\n'){
                   argument2[curr_size2] = (char)c;
@@ -680,7 +680,9 @@ int main(){
               argument2[curr_size2] = '\0';
               
               char argument3[MAX] = {'\0'};
-              c = getchar();
+              if(c != '\n'){
+                  c = getchar();
+              }
               int curr_size3 = 0;
               while(c != ' ' && c != '\n'){
                   argument3[curr_size3] = (char)c;
@@ -690,7 +692,9 @@ int main(){
               argument3[curr_size3] = '\0';
 
               char argument4[MAX] = {'\0'};
-              c = getchar();
+              if(c != '\n'){
+                  c = getchar();
+              }
               int curr_size4 = 0;
               while(c != '\n'){
                   argument4[curr_size4] = (char)c;
@@ -709,6 +713,9 @@ int main(){
                   printf("Syntax Error\n");
               }
               else if(getStringLength(argument3) == 0){
+                  printf("Syntax Error\n");
+              }
+             else if(getStringLength(argument4) == 0){
                   printf("Syntax Error\n");
               }
               else

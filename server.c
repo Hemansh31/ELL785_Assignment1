@@ -958,6 +958,7 @@ int main(int total_Arguments, char *argument_Pointers[]){
                       }
                       int foundstu = 0;
                       int foundsub = 0;
+                      int invalidMark = 0;
                       // int sind = 0;
                       // int subin = 0;
                       for(int j=0; j < marks_db_size; j++)
@@ -974,7 +975,11 @@ int main(int total_Arguments, char *argument_Pointers[]){
                               foundsub = 1;
                               int x;
                               sscanf(new_mark, "%d", &x);
-                              marks_db[j].listOfSubjects[k].marks = x;
+                              if(x <= 100 && x >= 0){
+                                invalidMark = 1;
+                                marks_db[j].listOfSubjects[k].marks = x;
+                              }
+                              
                             }
                           }
                           break;
@@ -990,10 +995,15 @@ int main(int total_Arguments, char *argument_Pointers[]){
                         length = write(newSocket_fd, "No Such Subject", getStringLength("No Such Subject") + 1);
 
                       }
+                      else if(invalidMark == 0)
+                      {
+                        length = write(newSocket_fd, "Invalid Marks", getStringLength("Invalid Marks") + 1);
+
+                      }
                       else
                       {
                         FILE *fptr;
-                        fptr = fopen("stud.txt", "w");
+                        fptr = fopen("student_marks.txt", "w");
 
                         if(fptr == NULL)
                         {
