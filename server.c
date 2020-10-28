@@ -918,6 +918,135 @@ int main(int total_Arguments, char *argument_Pointers[]){
 
                       }
                     }
+                    else if(compare_Strings("updateMarks", command) == 1)
+                    {
+                      char firstn[len] = {'\0'};
+                      char lastn[len] = {'\0'};
+                      char sub[len] = {'\0'};
+                      char new_mark[len] = {'\0'};
+                      int i=0;
+                      int ind=0;
+                      while(argument[i] != ' ')
+                      {
+                        firstn[ind] = argument[i];
+                        i++;
+                        ind++;
+                      }
+                      i++;
+                      ind = 0;
+                      while(argument[i] != ' ')
+                      {
+                        lastn[ind] = argument[i];
+                        i++;
+                        ind++;
+                      }
+                      i++;
+                      ind = 0;
+                      while(argument[i] != ' ')
+                      {
+                        sub[ind] = argument[i];
+                        i++;
+                        ind++;
+                      }
+                      i++;
+                      ind = 0;
+                      while(argument[i] != '\0')
+                      {
+                        new_mark[ind] = argument[i];
+                        i++;
+                        ind++;
+                      }
+                      int foundstu = 0;
+                      int foundsub = 0;
+                      // int sind = 0;
+                      // int subin = 0;
+                      for(int j=0; j < marks_db_size; j++)
+                      {
+                        if(compare_Strings((marks_db[j]).firstname, firstn) == 1 && compare_Strings((marks_db[j]).lastname, lastn) == 1)
+                        {
+                          foundstu = 1;
+                          // sind = j;
+                          for(int k=0; k < num_Sub; k++)
+                          {
+                            if(compare_Strings((marks_db[j]).listOfSubjects[k].subjectName, sub) == 1)
+                            {
+                              // subin = k;
+                              foundsub = 1;
+                              int x;
+                              sscanf(new_mark, "%d", &x);
+                              marks_db[j].listOfSubjects[k].marks = x;
+                            }
+                          }
+                          break;
+                        }
+                      }
+                      // printf("%d\n", (marks_db[sind]).listOfSubjects[subin].marks);
+                      if(foundstu == 0)
+                      {
+                        length = write(newSocket_fd, "No Such Student Exists", getStringLength("No Such Student Exists") + 1);
+                      }
+                      else if(foundsub == 0)
+                      {
+                        length = write(newSocket_fd, "No Such Subject", getStringLength("No Such Subject") + 1);
+
+                      }
+                      else
+                      {
+                        FILE *fptr;
+                        fptr = fopen("stud.txt", "w");
+
+                        if(fptr == NULL)
+                        {
+                          printf("Error opening file");
+                          exit(1);
+                        }
+                        char *strings[MAX];
+                        strings[0] = "/* Firstname   Lastname   (Transfiguration)   (Defence Against Dark Arts)   (Potions)   (Herbology)   (Charms) */ /* Max Marks : 100 */\n";
+                        int sizeNow = 1;
+                        char mar[MAX];
+                        int pointer = 0;
+                        for(int j=0; j<marks_db_size; j++)
+                        {
+                          strings[sizeNow] = (marks_db[j]).firstname;
+                          sizeNow++;
+                          strings[sizeNow] = " ";
+                          sizeNow++;
+                          strings[sizeNow] = (marks_db[j]).lastname;
+                          sizeNow++;
+                          strings[sizeNow] = " ";
+                          sizeNow++;
+                          for(int k=0; k<num_Sub; k++)
+                          {
+                            if(k != num_Sub-1)
+                            {
+                              int maR = (marks_db[j]).listOfSubjects[k].marks;
+                              sprintf(mar + pointer, "%d", maR);
+                              strings[sizeNow] = mar + pointer;
+                              pointer = pointer + 4;
+                              sizeNow++;
+                              strings[sizeNow] = " ";
+                              sizeNow++;
+                            }
+                            else
+                            {
+                              int maR = (marks_db[j]).listOfSubjects[k].marks;
+                              sprintf(mar + pointer, "%d", maR);
+                              strings[sizeNow] = mar + pointer;
+                              pointer = pointer + 4;
+                              sizeNow++;
+                              strings[sizeNow] = "\n";
+                              sizeNow++;
+                            }
+                          }
+                        }
+                        addStrings(sizeNow, strings, socket_Buffer);
+                        printf("%s\n", socket_Buffer);
+                        fprintf(fptr, "%s", socket_Buffer);
+                        length = write(newSocket_fd, "Marks Updated Successfully", getStringLength("Marks Updated Successfully") + 1);
+                        fclose(fptr);
+
+                      }
+                    }
 
             }
             }
