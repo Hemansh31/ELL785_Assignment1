@@ -577,7 +577,7 @@ int main(){
                       argument
                   };
                   addStrings(2, strings, socket_Buffer);
-                  printf("%s\n", socket_Buffer);
+               //   printf("%s\n", socket_Buffer);
                   length = write(socket_fd, socket_Buffer, getStringLength(socket_Buffer) + 1);
                   length = read(socket_fd, socket_Buffer, MAX);
                   printf("\n   ");
