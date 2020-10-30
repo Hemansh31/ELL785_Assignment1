@@ -1,5 +1,5 @@
 /* Firstname   Lastname   (Transfiguration)   (Defence Against Dark Arts)   (Potions)   (Herbology)   (Charms) */ /* Max Marks : 100 */
-Harry Potter 74 99 100 74 98
+Harry Potter 74 100 100 74 98
 Ronald Weasly 52 75 85 15 84
 Hermione Granger 99 97 94 99 99
 Neville Longbottom 65 43 14 96 87
