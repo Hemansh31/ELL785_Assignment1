@@ -1011,7 +1011,7 @@ int main(int total_Arguments, char *argument_Pointers[]){
                           exit(1);
                         }
                         char *strings[MAX];
-                        strings[0] = "/* Firstname   Lastname   (Transfiguration)   (Defence Against Dark Arts)   (Potions)   (Herbology)   (Charms) */ /* Max Marks : 100 */\n";
+                        strings[0] = "/* Firstname   Lastname   (Transfiguration)   (Defence_Against_Dark_Arts)   (Potions)   (Herbology)   (Charms) */ /* Max Marks : 100 */\n";
                         int sizeNow = 1;
                         char mar[MAX];
                         int pointer = 0;
@@ -1050,7 +1050,7 @@ int main(int total_Arguments, char *argument_Pointers[]){
                           }
                         }
                         addStrings(sizeNow, strings, socket_Buffer);
-                        printf("%s\n", socket_Buffer);
+             //           printf("%s\n", socket_Buffer);
                         fprintf(fptr, "%s", socket_Buffer);
                         length = write(newSocket_fd, "Marks Updated Successfully", getStringLength("Marks Updated Successfully") + 1);
                         fclose(fptr);
