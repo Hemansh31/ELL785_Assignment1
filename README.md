@@ -1,4 +1,4 @@
-# ELL785_Assignment1
+# Socket Programming in C
 Compile instructions
 
 To compile client.c : gcc -o client client.c
